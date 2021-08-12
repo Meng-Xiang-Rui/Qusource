@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: qusource
+Version: 0.0.1
+Summary: Quantum circuit simulator
+Home-page: https://github.com/Meng-Xiang-Rui/Qusource
+Author: Xiangrui Meng
+Author-email: mxr@mail.ustc.edu.cn
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# Qusource
+ Quantum circuit simulator
+
+
