@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
   name="qusource",
-  version="0.0.3",
+  version="0.0.4",
   author="Xiangrui Meng",
   author_email="mxr@mail.ustc.edu.cn",
   description="Quantum circuit simulator",
