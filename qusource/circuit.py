@@ -3,7 +3,7 @@ from . import utils, unitary, gate, measurement
 from .calculation import fast_dot
 
 
-# TODO 预先设置gates，以提供自定义gate的需求，需要更新state generation、branch和element等
+# TODO 将generation改成 return np.array
 class Circuit:
     # def __init__(self, N, sites, gates, paras, ideal=True, noise_fuc=None):
     def __init__(self, N, sites, gates):
@@ -132,17 +132,7 @@ class Circuit:
             bran.insert(0, list(node_tmp))
         return bran
 
-    def state_generation(self):
-        """
-        generate a quantum state
-        :return: generated quantum state
-        """
-        # gates = dict()
-        # for op in self.paras:
-        #     opc = gate.gate_map[op]
-        #     paras = self.paras[op]
-        #     gates[op] = opc(self.ideal, *paras)
-
+    def state_generation_(self):
         tmp_state = self.init_state
         for step in range(self.steps):
             sites = self.sites[step]
@@ -154,6 +144,20 @@ class Circuit:
                 tmp_state = fast_dot(sites, op, tmp_state, self.N)
                 self.final_state = tmp_state
         return tmp_state
+
+    def state_generation(self):
+        """
+        generate a quantum state
+        :return: generated quantum state
+        """
+        # gates = dict()
+        # for op in self.paras:
+        #     opc = gate.gate_map[op]
+        #     paras = self.paras[op]
+        #     gates[op] = opc(self.ideal, *paras)
+
+        self.state_generation_()
+        return self.final_state
 
     def element(self, x):
         """
@@ -182,7 +186,7 @@ class Circuit:
         """
         ensemble = []
         for _ in range(size):
-            ensemble.append(self.state_generation())
+            ensemble.append(self.state_generation_())
         ensemble = np.array(ensemble)
         self.final_state = ensemble
         return ensemble

@@ -28,23 +28,24 @@ def unitary_check(x, threshold=1e-7):
         print('not unitary, error = {}'.format(distance))
 
 
-# TODO 添加自定义noise_func的功能，更自定义一点
+# TODO 添加自动优化fidelity参数的功能
 class Gate(abc.ABC):
-    def __init__(self, ideal, *paras):
+    def __init__(self, ideal, *paras, noise_func=noise):
         self.ideal = ideal
         self.paras = paras
         self.ideal_gate = self.generator_(*self.paras)
         self.gate_shape = (self.ideal_gate != 0).astype('int')
+        self.noise_func = noise_func
 
     @abc.abstractmethod
     def generator_(self, *paras):
         pass
 
-    def generator(self, noise_func=noise):
+    def generator(self):
         if self.ideal:
             return self.ideal_gate
         else:
-            paras = [noise_func(x) for x in self.paras]
+            paras = [self.noise_func(x) for x in self.paras]
             return self.generator_(*paras)
 
     def sparse_check(self):
