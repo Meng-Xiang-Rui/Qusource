@@ -1,24 +1,20 @@
 import numpy as np
-from . import utils, gate, measurement
+from . import utils, unitary, gate, measurement
 from .calculation import fast_dot
 
 
+# TODO 预先设置gates，以提供自定义gate的需求，需要更新state generation、branch和element等
 class Circuit:
-    def __init__(self, N, sites, gates, paras, ideal=True, noise_fuc=None):
+    # def __init__(self, N, sites, gates, paras, ideal=True, noise_fuc=None):
+    def __init__(self, N, sites, gates):
         """
         :param N: length of atoms chain
         :type sites: list of list(turtle)
-        :type gates: list of string
-        :type paras: dictionary from string to list(turtle)
-        :type ideal: True or False
-        :param noise_fuc: the function to generate noised parameters
+        :type gates: list of gates
         """
         self._N = N
         self.sites = sites
         self.gates = gates
-        self.ideal = ideal
-        self.paras = paras
-        self.noise_fuc = noise_fuc
         self.steps = len(sites)
         self.init_state = dict()
         self.layer = []
@@ -83,17 +79,11 @@ class Circuit:
         layer_tmp = [utils.loc(state)]
         self.layer.append(layer_tmp)
 
-        gates_shape = {}
-        for op in self.paras:
-            opc = gate.gate_map[op]
-            paras = self.paras[op]
-            gates_shape[op] = opc(self.ideal, *paras).gate_shape
-
         for step in range(self.steps):
             sites = self.sites[step]
             n = len(sites)
 
-            mat_shape = gates_shape[self.gates[step]]
+            mat_shape = self.gates[step].gate_shape
             layer_tmp = set()
             map_tmp_f = dict()
             map_tmp_b = dict()
@@ -147,15 +137,16 @@ class Circuit:
         generate a quantum state
         :return: generated quantum state
         """
-        gates = dict()
-        for op in self.paras:
-            opc = gate.gate_map[op]
-            paras = self.paras[op]
-            gates[op] = opc(self.ideal, *paras)
+        # gates = dict()
+        # for op in self.paras:
+        #     opc = gate.gate_map[op]
+        #     paras = self.paras[op]
+        #     gates[op] = opc(self.ideal, *paras)
+
         tmp_state = self.init_state
         for step in range(self.steps):
             sites = self.sites[step]
-            op = gates[self.gates[step]].generator()
+            op = self.gates[step].generator()
             if isinstance(tmp_state, dict):
                 tmp_state = fast_dot(sites, op, tmp_state, self.N, self.layer[step+1])
                 self.final_state = self.dic2array(tmp_state)
@@ -171,15 +162,15 @@ class Circuit:
         :return: psi(x), psi is the final state
         """
         branch = self.branch(x)
-        gates = dict()
-        for op in self.paras:
-            opc = gate.gate_map[op]
-            paras = self.paras[op]
-            gates[op] = opc(self.ideal, *paras)
+        # gates = dict()
+        # for op in self.paras:
+        #     opc = gate.gate_map[op]
+        #     paras = self.paras[op]
+        #     gates[op] = opc(self.ideal, *paras)
         tmp_state = self.init_state
         for step in range(self.steps):
             sites = self.sites[step]
-            op = gates[self.gates[step]].generator()
+            op = self.gates[step].generator()
             tmp_state = fast_dot(sites, op, tmp_state, self.N, branch[step+1])
         return tmp_state[branch[-1][0]]
 

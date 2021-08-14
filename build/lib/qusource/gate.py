@@ -28,9 +28,7 @@ def unitary_check(x, threshold=1e-7):
         print('not unitary, error = {}'.format(distance))
 
 
-gate_map = dict()
-
-
+# TODO 添加自定义noise_func的功能，更自定义一点
 class Gate(abc.ABC):
     def __init__(self, ideal, *paras):
         self.ideal = ideal
@@ -42,12 +40,20 @@ class Gate(abc.ABC):
     def generator_(self, *paras):
         pass
 
-    def generator(self):
+    def generator(self, noise_func=noise):
         if self.ideal:
             return self.ideal_gate
         else:
-            paras = [noise(x) for x in self.paras]
+            paras = [noise_func(x) for x in self.paras]
             return self.generator_(*paras)
+
+    def sparse_check(self):
+        mat = self.generator()
+        return sparse_check(mat)
+
+    def unitary_check(self):
+        mat = self.generator()
+        return unitary_check(mat)
 
 
 class Swap(Gate):
@@ -99,9 +105,9 @@ class Dephase(Gate):
         return self.generator_(phase)
 
 
-gate_map['swap'] = Swap
-gate_map['sto'] = Sto
-gate_map['dephase'] = Dephase
+# gate_map['swap'] = Swap
+# gate_map['sto'] = Sto
+# gate_map['dephase'] = Dephase
 
 
 ############################################################################################################
